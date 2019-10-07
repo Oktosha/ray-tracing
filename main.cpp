@@ -9,7 +9,7 @@ int main() {
   cout << "P3\n" << nx << " " << ny << "\n255\n";
   for (int j = ny - 1; j >= 0; --j) {
     for (int i = 0; i < nx; ++i) {
-      vec3 color(
+      Vec3 color(
         static_cast<float>(i) / static_cast<float>(nx),
         static_cast<float>(j) / static_cast<float>(ny),
         0.2
