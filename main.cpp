@@ -17,9 +17,14 @@ optional<float> hit_sphere(const Vec3& center, float radius, const Ray& r) {
 }
 
 Vec3 color(const Ray& r) {
-  if (hit_sphere(Vec3(0, 0, -1), 0.5, r)) {
-    return Vec3(1, 0, 0);
+
+  // Normal map for the sphere
+  if (auto t = hit_sphere(Vec3(0, 0, -1), 0.5, r)) {
+    Vec3 N = unit_vector(r.point_at_parameter(t.value()) - Vec3(0, 0, -1));
+    return 0.5 * (N + Vec3(1, 1, 1));
   }
+
+  // Gradient in the background
   Vec3 unit_direction = unit_vector(r.direction());
   float t = 0.5 * (unit_direction.y() + 1.0);
   return (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
