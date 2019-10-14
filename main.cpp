@@ -4,6 +4,51 @@
 
 using namespace std;
 
+struct HitRecord {
+  float t;
+  Vec3 p;
+  Vec3 normal;
+};
+
+class Hitable {
+  public:
+   optional<HitRecord> hit(const Ray& r, float t_min, float t_max) const = 0;
+};
+
+class Sphere : public Hitable {
+  public:
+    Sphere() {}
+    Sphere(Vec3 center, float radius): center(center), radius(radius) {}
+    virtual optional<HitRecord> hit(const Ray& r, float tmin, float tmax) const;
+
+    Vec3 center;
+    float radius;
+};
+
+optional<HitRecord> Sphere::hit(const Ray& r, float tmin, float tmax) const {
+  Vec3 oc = r.origin() - center;
+  float a = dot(r.direction(), r.direction());
+  float b = 2.0 * dot(oc, r.direction());
+  float c = dot(oc, oc) - radius * radius;
+  float discriminant = b * b - 4 * a * c;
+
+  if (discriminant >= 0) {
+    float temp = (-b - sqrt(discriminant)) / 2.0 * a;
+    if (temp < tmax && temp > tmin) {
+      return {temp,
+              r.point_at_parameter(temp),
+              (r.point_at_parameter(temp) - center) / radius};
+
+    float temp = (-b + sqrt(discriminant)) / 2.0 * a;
+    if (temp < tmax && temp > tmin) {
+      return {temp,
+              r.point_at_parameter(temp),
+              (r.point_at_parameter(temp) - center) / radius};
+    }
+  }
+  return {};
+}
+
 optional<float> hit_sphere(const Vec3& center, float radius, const Ray& r) {
   Vec3 oc = r.origin() - center;
   float a = dot(r.direction(), r.direction());
