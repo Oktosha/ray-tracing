@@ -1,5 +1,5 @@
-#ifndef RAYH
-#define RAYH
+#pragma once
+
 #include "vec3.h"
 
 struct Ray {
@@ -12,5 +12,3 @@ struct Ray {
   Vec3 A;
   Vec3 B;
 };
-
-#endif
