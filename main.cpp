@@ -36,21 +36,7 @@ class HitableList : public Hitable {
     vector<Hitable*> v;
 };
 
-
-optional<float> hit_sphere(const Vec3& center, float radius, const Ray& r) {
-  Vec3 oc = r.origin() - center;
-  float a = dot(r.direction(), r.direction());
-  float b = 2.0 * dot(oc, r.direction());
-  float c = dot(oc, oc) - radius * radius;
-  float discriminant = b * b - 4 * a * c;
-  if (discriminant < 0) {
-    return {};
-  }
-  return (-b - sqrt(discriminant)) / (2.0 * a);
-}
-
 optional<HitRecord> Sphere::hit(const Ray& r, float tmin, float tmax) const {
-  /*
   Vec3 oc = r.origin() - center;
   float a = dot(r.direction(), r.direction());
   float b = 2.0 * dot(oc, r.direction());
@@ -58,14 +44,14 @@ optional<HitRecord> Sphere::hit(const Ray& r, float tmin, float tmax) const {
   float discriminant = b * b - 4 * a * c;
 
   if (discriminant >= 0) {
-    if (float temp = (-b - sqrt(discriminant)) / 2.0 * a;
+    if (float temp = (-b - sqrt(discriminant)) / (2.0 * a);
         temp < tmax && temp > tmin) {
       HitRecord record{temp,
               r.point_at_parameter(temp),
               (r.point_at_parameter(temp) - center) / radius};
       return record;
     }
-    if (float temp = (-b + sqrt(discriminant)) / 2.0 * a;
+    if (float temp = (-b + sqrt(discriminant)) / (2.0 * a);
         temp < tmax && temp > tmin) {
       HitRecord record {temp,
               r.point_at_parameter(temp),
@@ -74,34 +60,10 @@ optional<HitRecord> Sphere::hit(const Ray& r, float tmin, float tmax) const {
     }
   }
   return {};
-  */
-
-  auto t = hit_sphere(center, radius, r);
-  if (!t) {
-    return {};
-  }
-  HitRecord record{t.value(), r.point_at_parameter(t.value()),
-                   unit_vector(r.point_at_parameter(t.value()) - center)};
-  return record;
 }
 
 optional<HitRecord> HitableList::hit(const Ray& r, float tmin, float tmax) const {
   return {};
-}
-
-
-Vec3 color(const Ray& r) {
-
-  // Normal map for the sphere
-  if (auto t = hit_sphere(Vec3(0, 0, -1), 0.5, r)) {
-    Vec3 N = unit_vector(r.point_at_parameter(t.value()) - Vec3(0, 0, -1));
-    return 0.5 * (N + Vec3(1, 1, 1));
-  }
-
-  // Gradient in the background
-  Vec3 unit_direction = unit_vector(r.direction());
-  float t = 0.5 * (unit_direction.y() + 1.0);
-  return (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
 }
 
 Vec3 color(const Ray& r, Hitable* world) {
