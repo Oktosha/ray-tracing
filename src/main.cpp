@@ -3,19 +3,9 @@
 #include <vector>
 #include <limits>
 #include "ray.h"
+#include "hitable.h"
 
 using namespace std;
-
-struct HitRecord {
-  float t;
-  Vec3 p;
-  Vec3 normal;
-};
-
-class Hitable {
-  public:
-   virtual optional<HitRecord> hit(const Ray& r, float t_min, float t_max) const = 0;
-};
 
 class Sphere : public Hitable {
   public:
