@@ -21,7 +21,7 @@ class Sphere : public Hitable {
   public:
     Sphere() {}
     Sphere(Vec3 center, float radius): center(center), radius(radius) {}
-    optional<HitRecord> hit(const Ray& r, float tmin, float tmax) const override;
+    optional<HitRecord> hit(const Ray& r, float t_min, float t_max) const override;
 
     Vec3 center;
     float radius;
@@ -31,12 +31,12 @@ class HitableList : public Hitable {
   public:
     HitableList() {}
     HitableList(vector<Hitable*> v): v(v) {}
-    optional<HitRecord> hit(const Ray& r, float tmin, float tmax) const override;
+    optional<HitRecord> hit(const Ray& r, float t_min, float t_max) const override;
 
     vector<Hitable*> v;
 };
 
-optional<HitRecord> Sphere::hit(const Ray& r, float tmin, float tmax) const {
+optional<HitRecord> Sphere::hit(const Ray& r, float t_min, float t_max) const {
   Vec3 oc = r.origin() - center;
   float a = dot(r.direction(), r.direction());
   float b = 2.0 * dot(oc, r.direction());
@@ -45,14 +45,14 @@ optional<HitRecord> Sphere::hit(const Ray& r, float tmin, float tmax) const {
 
   if (discriminant >= 0) {
     if (float temp = (-b - sqrt(discriminant)) / (2.0 * a);
-        temp < tmax && temp > tmin) {
+        temp < t_max && temp > t_min) {
       HitRecord record{temp,
               r.point_at_parameter(temp),
               (r.point_at_parameter(temp) - center) / radius};
       return record;
     }
     if (float temp = (-b + sqrt(discriminant)) / (2.0 * a);
-        temp < tmax && temp > tmin) {
+        temp < t_max && temp > t_min) {
       HitRecord record {temp,
               r.point_at_parameter(temp),
               (r.point_at_parameter(temp) - center) / radius};
@@ -62,8 +62,16 @@ optional<HitRecord> Sphere::hit(const Ray& r, float tmin, float tmax) const {
   return {};
 }
 
-optional<HitRecord> HitableList::hit(const Ray& r, float tmin, float tmax) const {
-  return {};
+optional<HitRecord> HitableList::hit(const Ray& r, float t_min, float t_max) const {
+  optional<HitRecord> ans = {};
+  double closest_so_far = t_max;
+  for (auto e : v) {
+    if (auto rec = e->hit(r, t_min, closest_so_far)) {
+      closest_so_far = rec.value().t;
+      ans = rec;
+    }
+  }
+  return ans;
 }
 
 Vec3 color(const Ray& r, Hitable* world) {
@@ -89,7 +97,9 @@ int main() {
   Vec3 vertical(0.0, 2.0, 0.0);
   Vec3 origin(0.0, 0.0, 0.0);
 
-  Sphere sphere(Vec3(0, 0, -1), 0.5);
+  Sphere small_sphere(Vec3(0, 0, -1), 0.5);
+  Sphere big_sphere(Vec3(0, -100.5, -1), 100);
+  HitableList world({&small_sphere, &big_sphere});
 
   for (int j = ny - 1; j >= 0; --j) {
     for (int i = 0; i < nx; ++i) {
@@ -98,7 +108,7 @@ int main() {
 
       Ray r(origin,
             lower_left_corner - origin + u * horizontal + v * vertical);
-      Vec3 col = color(r, &sphere);
+      Vec3 col = color(r, &world);
 
       int ir = static_cast<int>(255.99 * col.r());
       int ig = static_cast<int>(255.99 * col.g());
