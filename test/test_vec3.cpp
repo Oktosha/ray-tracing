@@ -1,4 +1,4 @@
-#include "vec3.h"
+#include "../src/vec3.h"
 
 using namespace std;
 

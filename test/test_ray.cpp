@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cassert>
 
-#include "ray.h"
+#include "../src/ray.h"
 
 
 using namespace std;
