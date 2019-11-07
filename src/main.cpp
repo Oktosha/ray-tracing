@@ -3,6 +3,7 @@
 #include <vector>
 #include <limits>
 #include <random>
+#include <cmath>
 
 #include "ray.h"
 #include "hitable.h"
@@ -12,6 +13,7 @@
 
 using namespace std;
 
+// Returns random float from [0, 1)
 float MyRandom() {
   static random_device rd;
   static mt19937 gen(rd());
@@ -19,11 +21,20 @@ float MyRandom() {
   return dis(gen);
 }
 
+Vec3 RandomInUnitSphere() {
+  Vec3 p;
+  do {
+    p = 2.0 * Vec3(MyRandom(), MyRandom(), MyRandom()) - Vec3(1, 1, 1);
+  } while (p.squared_length() >= 1.0);
+  return p;
+}
+
 Vec3 Color(const Ray& r, Hitable* world) {
 
-  // If we hit anything, color according to the normal
-  if(auto rec = world->hit(r, 0.0, numeric_limits<float>::max())) {
-    return 0.5 * (rec.value().normal + Vec3(1, 1, 1));
+  // If we hit anything, ray goes in random direction
+  if(auto rec = world->hit(r, 0.001, numeric_limits<float>::max())) {
+    Vec3 random_direction = rec.value().normal + RandomInUnitSphere();
+    return 0.5 * Color(Ray(rec.value().p, random_direction), world);
   }
 
   // Gradient in the background
@@ -58,6 +69,11 @@ int main() {
       }
 
       result_color /= ns;
+
+      // gamma2 transform (whatever that means)
+      result_color = Vec3(sqrt(result_color.r()),
+                                sqrt(result_color.g()),
+                                sqrt(result_color.b()));
 
       int ir = static_cast<int>(255.99 * result_color.r());
       int ig = static_cast<int>(255.99 * result_color.g());
