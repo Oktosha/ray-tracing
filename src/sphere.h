@@ -19,9 +19,9 @@ class Sphere : public Hitable {
 std::optional<HitRecord>
   Sphere::hit(const Ray& r, float t_min, float t_max) const {
 
-  Vec3 oc = r.origin() - center;
-  float a = dot(r.direction(), r.direction());
-  float b = 2.0 * dot(oc, r.direction());
+  Vec3 oc = r.origin - center;
+  float a = dot(r.direction, r.direction);
+  float b = 2.0 * dot(oc, r.direction);
   float c = dot(oc, oc) - radius * radius;
   float discriminant = b * b - 4 * a * c;
 
