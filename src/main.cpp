@@ -2,6 +2,7 @@
 #include <optional>
 #include <vector>
 #include <limits>
+#include <random>
 
 #include "ray.h"
 #include "hitable.h"
@@ -27,6 +28,8 @@ Vec3 color(const Ray& r, Hitable* world) {
 int main() {
   int nx = 200;
   int ny = 100;
+  int ns = 100;
+
   cout << "P3\n" << nx << " " << ny << "\n255\n";
 
   Camera camera;
@@ -35,17 +38,27 @@ int main() {
   Sphere big_sphere(Vec3(0, -100.5, -1), 100);
   HitableList world({&small_sphere, &big_sphere});
 
+  random_device rd;
+  mt19937 gen(rd());
+  uniform_real_distribution<float> dis(0.0, 1.0);
+
   for (int j = ny - 1; j >= 0; --j) {
     for (int i = 0; i < nx; ++i) {
-      float u = static_cast<float>(i) / static_cast<float>(nx);
-      float v = static_cast<float>(j) / static_cast<float>(ny);
+      Vec3 result_color(0, 0, 0);
+      for (int s = 0; s < ns; ++s) {
+        float u = static_cast<float>(i + dis(gen)) / static_cast<float>(nx);
+        float v = static_cast<float>(j + dis(gen)) / static_cast<float>(ny);
 
-      Ray r = camera.get_ray(u, v);
-      Vec3 col = color(r, &world);
+        Ray r = camera.get_ray(u, v);
+        Vec3 sample_color = color(r, &world);
+        result_color += sample_color;
+      }
 
-      int ir = static_cast<int>(255.99 * col.r());
-      int ig = static_cast<int>(255.99 * col.g());
-      int ib = static_cast<int>(255.99 * col.b());
+      result_color /= ns;
+
+      int ir = static_cast<int>(255.99 * result_color.r());
+      int ig = static_cast<int>(255.99 * result_color.g());
+      int ib = static_cast<int>(255.99 * result_color.b());
 
       cout << ir << " " << ig << " " << ib << "\n";
     }

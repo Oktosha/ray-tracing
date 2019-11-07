@@ -20,14 +20,15 @@ struct Vec3 {
   inline float operator[](int i) const { return e[i]; }
   inline float& operator[](int i) { return e[i]; }
 
-  /*
+
   inline Vec3 operator+=(const Vec3 &v2);
+  /*
   inline Vec3 operator-=(const Vec3 &v2);
   inline Vec3 operator*=(const Vec3 &v2);
   inline Vec3 operator/=(const Vec3 &v2);
   inline Vec3 operator*=(const float &v2);
-  inline Vec3 operator/=(const float &v2);
   */
+  inline Vec3 operator/=(float f);
 
   inline float length() const;
   inline float squared_length() const;
@@ -75,6 +76,16 @@ inline Vec3 operator*(float k, const Vec3 &v) {
 
 inline Vec3 operator/(const Vec3 &v, float k) {
   return Vec3({v[0] / k, v[1] / k, v[2] / k});
+}
+
+inline Vec3 Vec3::operator+=(const Vec3 &v2) {
+    *this = *this + v2;
+    return *this;
+}
+
+inline Vec3 Vec3::operator/=(float f) {
+    *this = *this / f;
+    return *this;
 }
 
 inline float dot(const Vec3 &v1, const Vec3 &v2) {
