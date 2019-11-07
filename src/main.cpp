@@ -2,67 +2,13 @@
 #include <optional>
 #include <vector>
 #include <limits>
+
 #include "ray.h"
 #include "hitable.h"
+#include "sphere.h"
+#include "hitable_list.h"
 
 using namespace std;
-
-class Sphere : public Hitable {
-  public:
-    Sphere() {}
-    Sphere(Vec3 center, float radius): center(center), radius(radius) {}
-    optional<HitRecord> hit(const Ray& r, float t_min, float t_max) const override;
-
-    Vec3 center;
-    float radius;
-};
-
-class HitableList : public Hitable {
-  public:
-    HitableList() {}
-    HitableList(vector<Hitable*> v): v(v) {}
-    optional<HitRecord> hit(const Ray& r, float t_min, float t_max) const override;
-
-    vector<Hitable*> v;
-};
-
-optional<HitRecord> Sphere::hit(const Ray& r, float t_min, float t_max) const {
-  Vec3 oc = r.origin() - center;
-  float a = dot(r.direction(), r.direction());
-  float b = 2.0 * dot(oc, r.direction());
-  float c = dot(oc, oc) - radius * radius;
-  float discriminant = b * b - 4 * a * c;
-
-  if (discriminant >= 0) {
-    if (float temp = (-b - sqrt(discriminant)) / (2.0 * a);
-        temp < t_max && temp > t_min) {
-      HitRecord record{temp,
-              r.point_at_parameter(temp),
-              (r.point_at_parameter(temp) - center) / radius};
-      return record;
-    }
-    if (float temp = (-b + sqrt(discriminant)) / (2.0 * a);
-        temp < t_max && temp > t_min) {
-      HitRecord record {temp,
-              r.point_at_parameter(temp),
-              (r.point_at_parameter(temp) - center) / radius};
-      return record;
-    }
-  }
-  return {};
-}
-
-optional<HitRecord> HitableList::hit(const Ray& r, float t_min, float t_max) const {
-  optional<HitRecord> ans = {};
-  double closest_so_far = t_max;
-  for (auto e : v) {
-    if (auto rec = e->hit(r, t_min, closest_so_far)) {
-      closest_so_far = rec.value().t;
-      ans = rec;
-    }
-  }
-  return ans;
-}
 
 Vec3 color(const Ray& r, Hitable* world) {
 
