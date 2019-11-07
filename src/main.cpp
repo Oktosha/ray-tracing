@@ -7,6 +7,7 @@
 #include "hitable.h"
 #include "sphere.h"
 #include "hitable_list.h"
+#include "camera.h"
 
 using namespace std;
 
@@ -28,10 +29,7 @@ int main() {
   int ny = 100;
   cout << "P3\n" << nx << " " << ny << "\n255\n";
 
-  Vec3 lower_left_corner(-2.0, -1.0, -1.0);
-  Vec3 horizontal(4.0, 0.0, 0.0);
-  Vec3 vertical(0.0, 2.0, 0.0);
-  Vec3 origin(0.0, 0.0, 0.0);
+  Camera camera;
 
   Sphere small_sphere(Vec3(0, 0, -1), 0.5);
   Sphere big_sphere(Vec3(0, -100.5, -1), 100);
@@ -42,8 +40,7 @@ int main() {
       float u = static_cast<float>(i) / static_cast<float>(nx);
       float v = static_cast<float>(j) / static_cast<float>(ny);
 
-      Ray r(origin,
-            lower_left_corner - origin + u * horizontal + v * vertical);
+      Ray r = camera.get_ray(u, v);
       Vec3 col = color(r, &world);
 
       int ir = static_cast<int>(255.99 * col.r());
