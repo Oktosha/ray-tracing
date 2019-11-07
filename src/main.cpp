@@ -28,7 +28,7 @@ Vec3 color(const Ray& r, Hitable* world) {
 int main() {
   int nx = 200;
   int ny = 100;
-  int ns = 100;
+  int ns = 100; // number of samples per pixel (antialiasing)
 
   cout << "P3\n" << nx << " " << ny << "\n255\n";
 
