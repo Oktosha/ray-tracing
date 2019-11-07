@@ -15,5 +15,5 @@ class Hitable {
   public:
     virtual std::optional<HitRecord>
       hit(const Ray& r, float t_min, float t_max) const = 0;
-    virtual ~Hitable(){};
+    virtual ~Hitable() = default;
 };
