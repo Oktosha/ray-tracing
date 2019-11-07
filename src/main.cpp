@@ -12,7 +12,14 @@
 
 using namespace std;
 
-Vec3 color(const Ray& r, Hitable* world) {
+float MyRandom() {
+  static random_device rd;
+  static mt19937 gen(rd());
+  static uniform_real_distribution<float> dis(0.0, 1.0);
+  return dis(gen);
+}
+
+Vec3 Color(const Ray& r, Hitable* world) {
 
   // If we hit anything, color according to the normal
   if(auto rec = world->hit(r, 0.0, numeric_limits<float>::max())) {
@@ -38,19 +45,15 @@ int main() {
   Sphere big_sphere(Vec3(0, -100.5, -1), 100);
   HitableList world({&small_sphere, &big_sphere});
 
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_real_distribution<float> dis(0.0, 1.0);
-
   for (int j = ny - 1; j >= 0; --j) {
     for (int i = 0; i < nx; ++i) {
       Vec3 result_color(0, 0, 0);
       for (int s = 0; s < ns; ++s) {
-        float u = static_cast<float>(i + dis(gen)) / static_cast<float>(nx);
-        float v = static_cast<float>(j + dis(gen)) / static_cast<float>(ny);
+        float u = static_cast<float>(i + MyRandom()) / static_cast<float>(nx);
+        float v = static_cast<float>(j + MyRandom()) / static_cast<float>(ny);
 
         Ray r = camera.get_ray(u, v);
-        Vec3 sample_color = color(r, &world);
+        Vec3 sample_color = Color(r, &world);
         result_color += sample_color;
       }
 
