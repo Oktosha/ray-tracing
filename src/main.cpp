@@ -49,11 +49,15 @@ int main() {
 
   Camera camera;
 
-  Sphere small_sphere(Vec3(0, 0, -1), 0.5,
-                      make_unique<Metal>(Vec3(0.8, 0.3, 0.5)));
+  Sphere center_sphere(Vec3(0, 0, -1), 0.5,
+                      make_unique<Lambertian>(Vec3(0.8, 0.3, 0.3)));
   Sphere big_sphere(Vec3(0, -100.5, -1), 100,
-                    make_unique<Lambertian>(Vec3(0.3, 0.8, 0.5)));
-  HitableList world({&small_sphere, &big_sphere});
+                    make_unique<Lambertian>(Vec3(0.8, 0.8, 0.0)));
+  Sphere right_sphere(Vec3(1, 0, -1), 0.5,
+                    make_unique<Metal>(Vec3(0.8, 0.6, 0.2)));
+  Sphere left_sphere(Vec3(-1, 0, -1), 0.5,
+                    make_unique<Metal>(Vec3(0.8, 0.8, 0.8)));
+  HitableList world({&center_sphere, &big_sphere, &left_sphere, &right_sphere});
 
   for (int j = ny - 1; j >= 0; --j) {
     for (int i = 0; i < nx; ++i) {
