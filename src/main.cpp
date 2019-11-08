@@ -17,12 +17,21 @@ using namespace std;
 
 
 
-Vec3 Color(const Ray& r, Hitable* world) {
+Vec3 Color(const Ray& r, Hitable* world, int depth) {
 
-  // If we hit anything, ray goes in random direction
-  if(auto rec = world->hit(r, 0.001, numeric_limits<float>::max())) {
-    Vec3 random_direction = rec.value().normal + RandomInUnitSphere();
-    return 0.5 * Color(Ray(rec.value().p, random_direction), world);
+  // if we hit anything
+  if(auto hit_record = world->hit(r, 0.001, numeric_limits<float>::max())) {
+    // if the recusion depth isn't too big and the ray is scattered
+    if (auto scatter_record =
+        hit_record->material->scatter(r, hit_record->p, hit_record->normal);
+        scatter_record && (depth < 50)) {
+        // return attenuation * recursively called color
+        return scatter_record->attenuation
+          * Color(scatter_record->scattered_ray, world, depth + 1);
+    } else  {
+      // else (the recursion too big or the ray is consumed) return black
+      return Vec3(0, 0, 0);
+    }
   }
 
   // Gradient in the background
@@ -41,9 +50,9 @@ int main() {
   Camera camera;
 
   Sphere small_sphere(Vec3(0, 0, -1), 0.5,
-                      make_unique<Lambertian>(Vec3(0.5, 0.5, 0.5)));
+                      make_unique<Lambertian>(Vec3(0.8, 0.3, 0.5)));
   Sphere big_sphere(Vec3(0, -100.5, -1), 100,
-                    make_unique<Lambertian>(Vec3(0.5, 0.5, 0.5)));
+                    make_unique<Lambertian>(Vec3(0.3, 0.8, 0.5)));
   HitableList world({&small_sphere, &big_sphere});
 
   for (int j = ny - 1; j >= 0; --j) {
@@ -54,7 +63,7 @@ int main() {
         float v = static_cast<float>(j + MyRandom()) / static_cast<float>(ny);
 
         Ray r = camera.get_ray(u, v);
-        Vec3 sample_color = Color(r, &world);
+        Vec3 sample_color = Color(r, &world, 0);
         result_color += sample_color;
       }
 
