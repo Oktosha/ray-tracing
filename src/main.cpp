@@ -50,7 +50,7 @@ int main() {
   Camera camera;
 
   Sphere small_sphere(Vec3(0, 0, -1), 0.5,
-                      make_unique<Lambertian>(Vec3(0.8, 0.3, 0.5)));
+                      make_unique<Metal>(Vec3(0.8, 0.3, 0.5)));
   Sphere big_sphere(Vec3(0, -100.5, -1), 100,
                     make_unique<Lambertian>(Vec3(0.3, 0.8, 0.5)));
   HitableList world({&small_sphere, &big_sphere});

@@ -25,12 +25,32 @@ class Lambertian : public Material {
 
     std::optional<ScatterRecord>
     scatter(const Ray& ray_in, const Vec3& hit_point, const Vec3& hit_normal) const override {
-      ScatterRecord ans;
       Vec3 target = hit_point + hit_normal + RandomInUnitSphere();
+      ScatterRecord ans;
       ans.scattered_ray = {hit_point, target - hit_point};
       ans.attenuation = albedo;
       return ans;
     }
+
+    Vec3 albedo;
+};
+
+class Metal : public Material {
+  public:
+    Metal(const Vec3& albedo): albedo(albedo) {}
+
+    std::optional<ScatterRecord>
+    scatter(const Ray& ray_in, const Vec3& hit_point, const Vec3& hit_normal) const override {
+      Vec3 reflected = reflect(unit_vector(ray_in.direction), hit_normal);
+      if (dot(reflected, hit_normal) <= 0) {
+        return {};
+      }
+      ScatterRecord ans;
+      ans.scattered_ray = Ray(hit_point, reflected);
+      ans.attenuation = albedo;
+      return ans;
+    }
+
 
     Vec3 albedo;
 };

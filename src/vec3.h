@@ -115,3 +115,7 @@ inline float Vec3::length() const {
 bool operator ==(const Vec3 &v1, const Vec3 &v2) {
   return (v1 - v2).length() < Vec3::EPS;
 }
+
+Vec3 reflect(const Vec3& v, const Vec3& n) {
+  return v - 2 * dot(v, n) * n;
+}
