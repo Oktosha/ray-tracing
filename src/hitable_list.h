@@ -21,7 +21,7 @@ std::optional<HitRecord>
   double closest_so_far = t_max;
   for (auto e : v) {
     if (auto rec = e->hit(r, t_min, closest_so_far)) {
-      closest_so_far = rec.value().t;
+      closest_so_far = rec->t;
       ans = rec;
     }
   }
