@@ -11,6 +11,7 @@
 #include "hitable_list.h"
 #include "camera.h"
 #include "random.h"
+#include "material.h"
 
 using namespace std;
 
@@ -39,8 +40,10 @@ int main() {
 
   Camera camera;
 
-  Sphere small_sphere(Vec3(0, 0, -1), 0.5);
-  Sphere big_sphere(Vec3(0, -100.5, -1), 100);
+  Sphere small_sphere(Vec3(0, 0, -1), 0.5,
+                      make_unique<Lambertian>(Vec3(0.5, 0.5, 0.5)));
+  Sphere big_sphere(Vec3(0, -100.5, -1), 100,
+                    make_unique<Lambertian>(Vec3(0.5, 0.5, 0.5)));
   HitableList world({&small_sphere, &big_sphere});
 
   for (int j = ny - 1; j >= 0; --j) {

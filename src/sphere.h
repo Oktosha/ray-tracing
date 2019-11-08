@@ -10,7 +10,8 @@
 class Sphere : public Hitable {
   public:
     Sphere() {}
-    Sphere(Vec3 center, float radius): center(center), radius(radius) {}
+    Sphere(Vec3 center, float radius, std::unique_ptr<Material> material)
+      : center(center), radius(radius), material(std::move(material)) {}
     std::optional<HitRecord>
       hit(const Ray& r, float t_min, float t_max) const override;
 
