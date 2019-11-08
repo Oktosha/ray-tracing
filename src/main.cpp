@@ -10,24 +10,11 @@
 #include "sphere.h"
 #include "hitable_list.h"
 #include "camera.h"
+#include "random.h"
 
 using namespace std;
 
-// Returns random float from [0, 1)
-float MyRandom() {
-  static random_device rd;
-  static mt19937 gen(rd());
-  static uniform_real_distribution<float> dis(0.0, 1.0);
-  return dis(gen);
-}
 
-Vec3 RandomInUnitSphere() {
-  Vec3 p;
-  do {
-    p = 2.0 * Vec3(MyRandom(), MyRandom(), MyRandom()) - Vec3(1, 1, 1);
-  } while (p.squared_length() >= 1.0);
-  return p;
-}
 
 Vec3 Color(const Ray& r, Hitable* world) {
 
