@@ -54,9 +54,9 @@ int main() {
   Sphere big_sphere(Vec3(0, -100.5, -1), 100,
                     make_unique<Lambertian>(Vec3(0.8, 0.8, 0.0)));
   Sphere right_sphere(Vec3(1, 0, -1), 0.5,
-                    make_unique<Metal>(Vec3(0.8, 0.6, 0.2)));
+                    make_unique<Metal>(Vec3(0.8, 0.6, 0.2), 1.0));
   Sphere left_sphere(Vec3(-1, 0, -1), 0.5,
-                    make_unique<Metal>(Vec3(0.8, 0.8, 0.8)));
+                    make_unique<Metal>(Vec3(0.8, 0.8, 0.8), 0.3));
   HitableList world({&center_sphere, &big_sphere, &left_sphere, &right_sphere});
 
   for (int j = ny - 1; j >= 0; --j) {

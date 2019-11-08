@@ -37,7 +37,7 @@ class Lambertian : public Material {
 
 class Metal : public Material {
   public:
-    Metal(const Vec3& albedo): albedo(albedo) {}
+    Metal(const Vec3& albedo, float fuzz): albedo(albedo), fuzz(fuzz) {}
 
     std::optional<ScatterRecord>
     scatter(const Ray& ray_in, const Vec3& hit_point, const Vec3& hit_normal) const override {
@@ -46,11 +46,12 @@ class Metal : public Material {
         return {};
       }
       ScatterRecord ans;
-      ans.scattered_ray = Ray(hit_point, reflected);
+      ans.scattered_ray = Ray(hit_point, reflected + fuzz * RandomInUnitSphere());
       ans.attenuation = albedo;
       return ans;
     }
 
 
     Vec3 albedo;
+    float fuzz;
 };
