@@ -2,7 +2,9 @@
 
 #include<optional>
 #include<cmath>
+#include<memory>
 
+#include "material.h"
 #include "hitable.h"
 
 class Sphere : public Hitable {
@@ -14,6 +16,7 @@ class Sphere : public Hitable {
 
     Vec3 center;
     float radius;
+    std::unique_ptr<Material> material;
 };
 
 std::optional<HitRecord>
@@ -30,14 +33,16 @@ std::optional<HitRecord>
         temp < t_max && temp > t_min) {
       HitRecord record{temp,
               r.point_at_parameter(temp),
-              (r.point_at_parameter(temp) - center) / radius};
+              (r.point_at_parameter(temp) - center) / radius,
+              material.get()};
       return record;
     }
     if (float temp = (-b + sqrt(discriminant)) / (2.0 * a);
         temp < t_max && temp > t_min) {
       HitRecord record {temp,
               r.point_at_parameter(temp),
-              (r.point_at_parameter(temp) - center) / radius};
+              (r.point_at_parameter(temp) - center) / radius,
+              material.get()};
       return record;
     }
   }
