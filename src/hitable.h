@@ -4,11 +4,13 @@
 
 #include "vec3.h"
 #include "ray.h"
+#include "material.h"
 
 struct HitRecord {
   float t;
   Vec3 p;
   Vec3 normal;
+  Material *material;
 };
 
 class Hitable {
