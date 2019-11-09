@@ -1,9 +1,10 @@
 #pragma once
 
-#include<cmath>
-#include<cstdlib>
-#include<iostream>
+#include <cmath>
+#include <cstdlib>
+#include <iostream>
 #include <vector>
+#include <optional>
 
 struct Vec3 {
   Vec3(): e(3, 0) {}
@@ -118,4 +119,14 @@ bool operator ==(const Vec3 &v1, const Vec3 &v2) {
 
 Vec3 reflect(const Vec3& v, const Vec3& n) {
   return v - 2 * dot(v, n) * n;
+}
+
+std::optional<Vec3> refract(const Vec3& v, const Vec3& n, float ni_over_nt) {
+  Vec3 uv = unit_vector(v);
+  float dt = dot(uv, n);
+  float discriminant = 1.0 - ni_over_nt * ni_over_nt * (1 - dt * dt);
+  if (discriminant > 0) {
+    return ni_over_nt*(uv - n * dt) - n * sqrt(discriminant);
+  }
+  return std::nullopt;
 }

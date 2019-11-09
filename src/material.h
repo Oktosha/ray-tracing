@@ -55,3 +55,51 @@ class Metal : public Material {
     Vec3 albedo;
     float fuzz;
 };
+
+class Dielectric : public Material {
+  public:
+
+    static float schlick(float cosine, float ref_idx) {
+      float r0 = (1 - ref_idx) / (1 + ref_idx);
+      r0 = r0 * r0;
+      return r0 + (1 - r0) * pow((1 - cosine), 5);
+    }
+
+    Dielectric(float ref_idx): ref_idx(ref_idx) {}
+
+    std::optional<ScatterRecord>
+    scatter(const Ray& ray_in, const Vec3& hit_point, const Vec3& hit_normal) const override {
+
+      Vec3 outward_normal;
+      Vec3 reflected = reflect(ray_in.direction, hit_normal);
+      Vec3 refracted;
+      Vec3 attenuation = Vec3(1.0, 1.0, 1.0);
+      float ni_over_nt;
+      float reflect_probability;
+      float cosine;
+
+      if (dot(ray_in.direction, hit_normal) > 0) {
+        outward_normal = -hit_normal;
+        ni_over_nt = ref_idx;
+        cosine = ref_idx * dot(ray_in.direction, hit_normal) / ray_in.direction.length();
+      } else {
+        outward_normal = hit_normal;
+        ni_over_nt = 1.0 / ref_idx;
+        cosine = -dot(ray_in.direction, hit_normal) / ray_in.direction.length();
+      }
+
+      if (auto refracted_optional = refract(ray_in.direction, outward_normal, ni_over_nt)) {
+        refracted = refracted_optional.value();
+        reflect_probability = schlick(cosine, ref_idx);
+      } else {
+        reflect_probability = 1.0;
+      }
+
+      if (MyRandom() < reflect_probability) {
+        return ScatterRecord{Ray(hit_point, reflected), attenuation};
+      }
+      return ScatterRecord{Ray(hit_point, refracted), attenuation};
+    }
+
+    float ref_idx;
+};

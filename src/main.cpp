@@ -43,7 +43,7 @@ Vec3 Color(const Ray& r, Hitable* world, int depth) {
 int main() {
   int nx = 200;
   int ny = 100;
-  int ns = 100; // number of samples per pixel (antialiasing)
+  int ns = 100; // number of samples per pixel
 
   cout << "P3\n" << nx << " " << ny << "\n255\n";
 
@@ -56,8 +56,11 @@ int main() {
   Sphere right_sphere(Vec3(1, 0, -1), 0.5,
                     make_unique<Metal>(Vec3(0.8, 0.6, 0.2), 1.0));
   Sphere left_sphere(Vec3(-1, 0, -1), 0.5,
-                    make_unique<Metal>(Vec3(0.8, 0.8, 0.8), 0.3));
-  HitableList world({&center_sphere, &big_sphere, &left_sphere, &right_sphere});
+                    make_unique<Dielectric>(1.5));
+  Sphere left_inner_sphere(Vec3(-1, 0, -1), -0.45,
+                    make_unique<Dielectric>(1.5));
+  HitableList world({&center_sphere, &big_sphere,
+                    &left_sphere, &left_inner_sphere, &right_sphere});
 
   for (int j = ny - 1; j >= 0; --j) {
     for (int i = 0; i < nx; ++i) {
