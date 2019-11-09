@@ -40,26 +40,63 @@ Vec3 Color(const Ray& r, Hitable* world, int depth) {
   return (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
 }
 
+OwningHitableList MakeWorld() {
+  OwningHitableList world;
+  Sphere floor(Vec3(0, -1000, 0), 1000, make_unique<Lambertian>(Vec3(0.5, 0.5, 0.5)));
+  world.v.push_back(make_unique<Sphere>(std::move(floor)));
+
+  for (int a = -11; a < 11; ++a) {
+    for (int b = -11; b < 11; ++b) {
+      float choose_mat = MyRandom();
+      Vec3 center(a + 0.9 * MyRandom(), 0.2, b + 0.9 * MyRandom());
+      if ((center-Vec3(4, 0.2, 0)).length() > 0.9) {
+        unique_ptr<Material> material;
+        if (choose_mat < 0.8) { // diffuse
+          material = make_unique<Lambertian>(Vec3(MyRandom() * MyRandom(),
+                                      MyRandom() * MyRandom(),
+                                      MyRandom() * MyRandom()));
+        } else if (choose_mat < 0.95) { // metal
+          material = make_unique<Metal>(
+            0.5 * Vec3(1 + MyRandom(), 1 + MyRandom(), 1 + MyRandom()),
+            0.5 * MyRandom());
+        } else { // glass
+          material = make_unique<Dielectric>(1.5);
+        }
+        Sphere sphere(center, 0.2, std::move(material));
+        world.v.push_back(make_unique<Sphere>(std::move(sphere)));
+      }
+    }
+  }
+
+  world.v.push_back(make_unique<Sphere>(Vec3(0, 1, 0), 1.0,
+    make_unique<Dielectric>(1.5)));
+  world.v.push_back(make_unique<Sphere>(Vec3(-4, 1, 0), 1.0,
+    make_unique<Lambertian>(Vec3(0.4, 0.2, 0.1))));
+  world.v.push_back(make_unique<Sphere>(Vec3(4, 1, 0), 1.0,
+    make_unique<Metal>(Vec3(0.7, 0.6, 0.5), 0.0)));
+
+  return world;
+}
+
+
 int main() {
-  int nx = 200;
-  int ny = 100;
-  int ns = 100; // number of samples per pixel
+  int nx = 1200;
+  int ny = 800;
+  int ns = 10; // number of samples per pixel
 
   cout << "P3\n" << nx << " " << ny << "\n255\n";
 
-  Vec3 lookfrom(3, 3, 2);
-  Vec3 lookat(0, 0, -1);
-  float dist_to_focus = (lookfrom - lookat).length();
-  float aperture = 2;
+    Vec3 lookfrom(13,2,3);
+    Vec3 lookat(0,0,0);
+    float dist_to_focus = 10.0;
+    float aperture = 0.1;
 
   Camera camera(lookfrom, lookat, Vec3(0, 1, 0),
     20, static_cast<float>(nx) / static_cast<float>(ny),
     aperture, dist_to_focus);
 
 
-  OwningHitableList world;
-  world.v.push_back(make_unique<Sphere>(Vec3(0, 0, -1), 0.5,
-                      make_unique<Lambertian>(Vec3(0.8, 0.3, 0.3))));
+  OwningHitableList world = MakeWorld();
 
   for (int j = ny - 1; j >= 0; --j) {
     for (int i = 0; i < nx; ++i) {

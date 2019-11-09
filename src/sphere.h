@@ -9,7 +9,6 @@
 
 class Sphere : public Hitable {
   public:
-    Sphere() {}
     Sphere(Vec3 center, float radius, std::unique_ptr<Material> material)
       : center(center), radius(radius), material(std::move(material)) {}
     std::optional<HitRecord>
