@@ -47,8 +47,14 @@ int main() {
 
   cout << "P3\n" << nx << " " << ny << "\n255\n";
 
-  Camera camera(Vec3(-2, 2, 1), Vec3(0, 0, -1), Vec3(0, 1, 0),
-    20, static_cast<float>(nx) / static_cast<float>(ny));
+  Vec3 lookfrom(3, 3, 2);
+  Vec3 lookat(0, 0, -1);
+  float dist_to_focus = (lookfrom - lookat).length();
+  float aperture = 2;
+
+  Camera camera(lookfrom, lookat, Vec3(0, 1, 0),
+    20, static_cast<float>(nx) / static_cast<float>(ny),
+    aperture, dist_to_focus);
 
   Sphere center_sphere(Vec3(0, 0, -1), 0.5,
                       make_unique<Lambertian>(Vec3(0.8, 0.3, 0.3)));

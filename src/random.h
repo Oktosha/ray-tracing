@@ -18,3 +18,11 @@ Vec3 RandomInUnitSphere() {
   } while (p.squared_length() >= 1.0);
   return p;
 }
+
+Vec3 RandomInUnitDisk() {
+  Vec3 p;
+  do {
+    p = 2.0 * Vec3(MyRandom(), MyRandom(), 0) - Vec3(1, 1, 0);
+  } while (p.squared_length() >= 1.0);
+  return p;
+}
