@@ -1,25 +1,27 @@
 #include <vector>
 #include <optional>
+#include <memory>
 
 #include "hitable.h"
 
+template <class T>
 class HitableList : public Hitable {
   public:
     HitableList() {}
-    HitableList(std::vector<Hitable*> v): v(v) {}
+    HitableList(std::vector<T> v): v(std::move(v)) {}
     std::optional<HitRecord>
       hit(const Ray& r, float t_min, float t_max) const override;
 
-    std::vector<Hitable*> v;
+    std::vector<T> v;
 };
 
 
-
-std::optional<HitRecord>
-  HitableList::hit(const Ray& r, float t_min, float t_max) const {
+template<class T>
+std::optional<HitRecord> HitableList<T>::hit(
+    const Ray& r, float t_min, float t_max) const {
   std::optional<HitRecord> ans = {};
   double closest_so_far = t_max;
-  for (auto e : v) {
+  for (const auto &e : v) {
     if (auto rec = e->hit(r, t_min, closest_so_far)) {
       closest_so_far = rec->t;
       ans = rec;
@@ -27,3 +29,6 @@ std::optional<HitRecord>
   }
   return ans;
 }
+
+using OwningHitableList = HitableList<std::unique_ptr<Hitable>>;
+using NonOwningHitableList = HitableList<Hitable*>;

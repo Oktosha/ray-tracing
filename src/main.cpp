@@ -56,18 +56,10 @@ int main() {
     20, static_cast<float>(nx) / static_cast<float>(ny),
     aperture, dist_to_focus);
 
-  Sphere center_sphere(Vec3(0, 0, -1), 0.5,
-                      make_unique<Lambertian>(Vec3(0.8, 0.3, 0.3)));
-  Sphere big_sphere(Vec3(0, -100.5, -1), 100,
-                    make_unique<Lambertian>(Vec3(0.8, 0.8, 0.0)));
-  Sphere right_sphere(Vec3(1, 0, -1), 0.5,
-                    make_unique<Metal>(Vec3(0.8, 0.6, 0.2), 1.0));
-  Sphere left_sphere(Vec3(-1, 0, -1), 0.5,
-                    make_unique<Dielectric>(1.5));
-  Sphere left_inner_sphere(Vec3(-1, 0, -1), -0.45,
-                    make_unique<Dielectric>(1.5));
-  HitableList world({&center_sphere, &big_sphere,
-                    &left_sphere, &left_inner_sphere, &right_sphere});
+
+  OwningHitableList world;
+  world.v.push_back(make_unique<Sphere>(Vec3(0, 0, -1), 0.5,
+                      make_unique<Lambertian>(Vec3(0.8, 0.3, 0.3))));
 
   for (int j = ny - 1; j >= 0; --j) {
     for (int i = 0; i < nx; ++i) {
