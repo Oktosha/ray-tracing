@@ -1,0 +1,4 @@
+build
+*.so
+raytracing.c
+.ipynb_checkpoints
