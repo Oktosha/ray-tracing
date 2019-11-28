@@ -13,7 +13,7 @@ def render(h, w):
 
 cdef extern from "hitable.h":
   cppclass Hitable:
-    int hit(float tmin, float tmax) const
+    pass
 
   cppclass Sphere(Hitable):
     pass
@@ -23,6 +23,6 @@ cdef extern from "render.h":
 
 def test_sphere():
   cdef unique_ptr[Sphere] sphere
-  sphere = make_unique[Sphere](5)
+  sphere = make_unique[Sphere](3)
   value = Render(sphere.get(), 100, 200)
   return value
