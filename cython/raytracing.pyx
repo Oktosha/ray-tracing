@@ -18,8 +18,11 @@ cdef extern from "hitable.h":
   cppclass Sphere(Hitable):
     pass
 
+cdef extern from "render.h":
+  int Render(Hitable *world, int h, int w)
+
 def test_sphere():
   cdef unique_ptr[Sphere] sphere
   sphere = make_unique[Sphere](5)
-  value = sphere.get().hit(0, 0)
+  value = Render(sphere.get(), 100, 200)
   return value
