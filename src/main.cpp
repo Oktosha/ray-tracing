@@ -78,18 +78,36 @@ OwningHitableList MakeWorld() {
   return world;
 }
 
+vector<vector<vector<float>>> Render(Hitable *world, Camera camera, int h, int w) {
+  int ns = 10;
+  vector<vector<vector<float>>> ans(h, vector<vector<float>>(w));
+  for (int j = 0; j < h; ++j) {
+    for (int i = 0; i < w; ++i) {
+      Vec3 result_color(0, 0, 0);
+      for (int s = 0; s < ns; ++s) {
+        float u = static_cast<float>(i + MyRandom()) / static_cast<float>(w);
+        float v = static_cast<float>(j + MyRandom()) / static_cast<float>(h);
+
+        Ray r = camera.get_ray(u, v);
+        Vec3 sample_color = Color(r, world, 0);
+        result_color += sample_color;
+      }
+      result_color /= ns;
+      ans[j][i] = result_color.e;
+    }
+  }
+  return ans;
+}
+
 
 int main() {
   int nx = 1200;
   int ny = 800;
-  int ns = 10; // number of samples per pixel
 
-  cout << "P3\n" << nx << " " << ny << "\n255\n";
-
-    Vec3 lookfrom(13,2,3);
-    Vec3 lookat(0,0,0);
-    float dist_to_focus = 10.0;
-    float aperture = 0.1;
+  Vec3 lookfrom(13,2,3);
+  Vec3 lookat(0,0,0);
+  float dist_to_focus = 10.0;
+  float aperture = 0.1;
 
   Camera camera(lookfrom, lookat, Vec3(0, 1, 0),
     20, static_cast<float>(nx) / static_cast<float>(ny),
@@ -98,19 +116,13 @@ int main() {
 
   OwningHitableList world = MakeWorld();
 
-  for (int j = ny - 1; j >= 0; --j) {
-    for (int i = 0; i < nx; ++i) {
-      Vec3 result_color(0, 0, 0);
-      for (int s = 0; s < ns; ++s) {
-        float u = static_cast<float>(i + MyRandom()) / static_cast<float>(nx);
-        float v = static_cast<float>(j + MyRandom()) / static_cast<float>(ny);
+  cout << "P3\n" << nx << " " << ny << "\n255\n";
 
-        Ray r = camera.get_ray(u, v);
-        Vec3 sample_color = Color(r, &world, 0);
-        result_color += sample_color;
-      }
+  auto image = Render(&world, camera, ny, nx);
 
-      result_color /= ns;
+  for (int i = image.size() - 1; i >= 0; --i) {
+    for (int j = 0; j < image[0].size(); ++j) {
+      Vec3 result_color(image[i][j]);
 
       // gamma2 transform (whatever that means)
       result_color = Vec3(sqrt(result_color.r()),
@@ -124,5 +136,6 @@ int main() {
       cout << ir << " " << ig << " " << ib << "\n";
     }
   }
+
   return 0;
 }

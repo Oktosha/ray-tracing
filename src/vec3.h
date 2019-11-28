@@ -8,6 +8,7 @@
 
 struct Vec3 {
   Vec3(): e(3, 0) {}
+  Vec3(std::vector<float> e): e(e) {}
   Vec3(float x, float y, float z): e({x, y, z}) {}
   inline float x() const { return e[0]; }
   inline float y() const { return e[1]; }
@@ -17,7 +18,7 @@ struct Vec3 {
   inline float b() const { return e[2]; }
 
   inline const Vec3& operator+() const { return *this; }
-  inline Vec3 operator-() const { return Vec3({-e[0], -e[1], -e[2]}); }
+  inline Vec3 operator-() const { return Vec3(-e[0], -e[1], -e[2]); }
   inline float operator[](int i) const { return e[i]; }
   inline float& operator[](int i) { return e[i]; }
 
@@ -52,31 +53,31 @@ inline std::ostream& operator<<(std::ostream &os, const Vec3 &v) {
 }
 
 inline Vec3 operator+(const Vec3 &v1, const Vec3 &v2) {
-  return Vec3({v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2]});
+  return Vec3(v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2]);
 }
 
 inline Vec3 operator-(const Vec3 &v1, const Vec3 &v2) {
-  return Vec3({v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2]});
+  return Vec3(v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2]);
 }
 
 inline Vec3 operator*(const Vec3 &v1, const Vec3 &v2) {
-  return Vec3({v1[0] * v2[0], v1[1] * v2[1], v1[2] * v2[2]});
+  return Vec3(v1[0] * v2[0], v1[1] * v2[1], v1[2] * v2[2]);
 }
 
 inline Vec3 operator/(const Vec3 &v1, const Vec3 &v2) {
-  return Vec3({v1[0] / v2[0], v1[1] / v2[1], v1[2] / v2[2]});
+  return Vec3(v1[0] / v2[0], v1[1] / v2[1], v1[2] / v2[2]);
 }
 
 inline Vec3 operator*(const Vec3 &v, float k) {
-  return Vec3({v[0] * k, v[1] * k, v[2] * k});
+  return Vec3(v[0] * k, v[1] * k, v[2] * k);
 }
 
 inline Vec3 operator*(float k, const Vec3 &v) {
-  return Vec3({v[0] * k, v[1] * k, v[2] * k});
+  return Vec3(v[0] * k, v[1] * k, v[2] * k);
 }
 
 inline Vec3 operator/(const Vec3 &v, float k) {
-  return Vec3({v[0] / k, v[1] / k, v[2] / k});
+  return Vec3(v[0] / k, v[1] / k, v[2] / k);
 }
 
 inline Vec3 Vec3::operator+=(const Vec3 &v2) {
@@ -94,11 +95,11 @@ inline float dot(const Vec3 &v1, const Vec3 &v2) {
 }
 
 inline Vec3 cross(const Vec3 &v1, const Vec3 &v2) {
-  return Vec3({
+  return Vec3(
     v1[1] * v2[2] - v1[2] * v2[1],
     v1[2] * v2[0] - v1[0] * v2[2],
     v1[0] * v2[1] - v1[1] * v2[0]
-  });
+  );
 }
 
 inline Vec3 unit_vector(Vec3 v) {
