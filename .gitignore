@@ -1,5 +1,7 @@
 a.out
 main
-
+.ipynb_checkpoints
 .DS_Store
 .vscode
+raytracing.c*
+raytracing.o
