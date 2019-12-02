@@ -43,7 +43,7 @@ cdef extern from "material.h":
 
 cdef extern from "camera.h":
   cppclass Camera:
-    Camera()
+    pass
 
 
 cdef extern from "render.h":
@@ -54,10 +54,10 @@ def render(world, camera, int h, int w):
   cdef unique_ptr[Camera] c_camera
   cdef OwningHitableList c_world
 
-  c_camera = make_unique[Camera]()
-
   for world_object in world:
     c_world.v.push_back(make_c_world_object(world_object))
+
+  c_camera = make_c_camera(camera)
 
   image = Render(&c_world, c_camera.get(), h, w)
   image = image[::-1]
@@ -67,6 +67,16 @@ def render(world, camera, int h, int w):
 cdef Vec3 make_vec3(args):
   return Vec3(args[0], args[1], args[2])
 
+cdef unique_ptr[Camera] make_c_camera(camera):
+  return make_unique[Camera](
+    make_vec3(camera["lookfrom"]),
+    make_vec3(camera["lookat"]),
+    make_vec3(camera["vup"]),
+    <float>camera["vfov"],
+    <float>camera["aspect"],
+    <float>camera["aperture"],
+    <float>camera["focus_distance"]
+  )
 
 cdef unique_ptr[Hitable] make_c_world_object(world_object):
   if world_object["type"] == "sphere":

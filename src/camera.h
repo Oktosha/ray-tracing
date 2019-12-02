@@ -25,8 +25,6 @@ class Camera {
       vertical = 2 * half_height * focus_dist * v;
     }
 
-    Camera(): Camera(Vec3(13,2,3), Vec3(0, 0, 0), Vec3(0, 1, 0), 20, 2, 0.1, 10) {}
-
     Ray get_ray(float s, float t) {
       Vec3 rd = lens_radius * RandomInUnitDisk();
       Vec3 offset = u * rd.x() + v * rd.y();
