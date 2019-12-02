@@ -60,6 +60,7 @@ def render(world, camera, int h, int w):
     c_world.v.push_back(make_c_world_object(world_object))
 
   image = Render(&c_world, c_camera.get(), h, w)
+  image = image[::-1]
   return image
 
 
