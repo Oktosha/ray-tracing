@@ -32,7 +32,7 @@ Vec3 Color(const Ray& r, Hitable* world, int depth) {
 }
 
 std::vector<std::vector<std::vector<float>>> Render(
-  Hitable *world, Camera camera, int h, int w) {
+  Hitable *world, Camera *camera, int h, int w) {
   using namespace std;
   int ns = 10;
   vector<vector<vector<float>>> ans(h, vector<vector<float>>(w));
@@ -43,7 +43,7 @@ std::vector<std::vector<std::vector<float>>> Render(
         float u = static_cast<float>(i + MyRandom()) / static_cast<float>(w);
         float v = static_cast<float>(j + MyRandom()) / static_cast<float>(h);
 
-        Ray r = camera.get_ray(u, v);
+        Ray r = camera->get_ray(u, v);
         Vec3 sample_color = Color(r, world, 0);
         result_color += sample_color;
       }

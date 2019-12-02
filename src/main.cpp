@@ -72,7 +72,7 @@ int main() {
 
   cout << "P3\n" << nx << " " << ny << "\n255\n";
 
-  auto image = Render(&world, camera, ny, nx);
+  auto image = Render(&world, &camera, ny, nx);
 
   for (int i = image.size() - 1; i >= 0; --i) {
     for (int j = 0; j < image[0].size(); ++j) {
