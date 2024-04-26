@@ -89,7 +89,7 @@ class Dielectric : public Material {
       }
 
       if (auto refracted_optional = refract(ray_in.direction, outward_normal, ni_over_nt)) {
-        refracted = refracted_optional.value();
+        refracted = *refracted_optional;
         reflect_probability = schlick(cosine, ref_idx);
       } else {
         reflect_probability = 1.0;

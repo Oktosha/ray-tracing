@@ -3,7 +3,7 @@
 
 from libcpp.memory cimport unique_ptr, make_unique
 from libcpp.vector cimport vector
-
+from libcpp.utility cimport move
 
 cdef extern from "vec3.h":
   cppclass Vec3:
@@ -24,6 +24,7 @@ cdef extern from "hitable_list.h":
 
 cdef extern from "sphere.h":
   cppclass Sphere(Hitable):
+    Sphere(Vec3 center, float radius, unique_ptr[Material] material)
     pass
 
 
@@ -32,13 +33,13 @@ cdef extern from "material.h":
     pass
 
   cppclass Lambertian:
-    pass
+    Lambertian(const Vec3& albedo)
 
   cppclass Metal:
-    pass
+    Metal(const Vec3& albedo, float fuzz)
 
   cppclass Dielectric:
-    pass
+    Dielectric(float ref_idx)
 
 
 cdef extern from "camera.h":
@@ -55,7 +56,7 @@ def render(world, camera, int h, int w):
   cdef OwningHitableList c_world
 
   for world_object in world:
-    c_world.v.push_back(make_c_world_object(world_object))
+    c_world.v.push_back(move(make_c_world_object(world_object)))
 
   c_camera = make_c_camera(camera)
 
@@ -68,7 +69,7 @@ cdef Vec3 make_vec3(args):
   return Vec3(args[0], args[1], args[2])
 
 cdef unique_ptr[Camera] make_c_camera(camera):
-  return make_unique[Camera](
+  return move(make_unique[Camera](
     make_vec3(camera["lookfrom"]),
     make_vec3(camera["lookat"]),
     make_vec3(camera["vup"]),
@@ -76,14 +77,14 @@ cdef unique_ptr[Camera] make_c_camera(camera):
     <float>camera["aspect"],
     <float>camera["aperture"],
     <float>camera["focus_distance"]
-  )
+  ))
 
 cdef unique_ptr[Hitable] make_c_world_object(world_object):
   if world_object["type"] == "sphere":
-    return <unique_ptr[Hitable]>make_unique[Sphere](
+    return unique_ptr[Hitable](new Sphere(
       make_vec3(world_object["center"]),
       <float>world_object["radius"],
-      make_c_material(world_object["material"]))
+      move(make_c_material(world_object["material"]))))
   # TODO: nicer exception, learn to display traceback in jupyter notebook
   print("World object '{}' not implemented".format(world_object["type"]))
   raise NotImplementedError(
@@ -92,18 +93,18 @@ cdef unique_ptr[Hitable] make_c_world_object(world_object):
 
 cdef unique_ptr[Material] make_c_material(material):
   if material["type"] == "lambertian":
-    return <unique_ptr[Material]>make_unique[Lambertian](
+    return <unique_ptr[Material]>(new Lambertian(
       make_vec3(material["albedo"])
-    )
+    ))
   elif material["type"] == "dielectric":
-    return <unique_ptr[Material]>make_unique[Dielectric](
+    return <unique_ptr[Material]>(new Dielectric(
       <float>material["ref_idx"]
-    )
+    ))
   elif material["type"] == "metal":
-    return <unique_ptr[Material]>make_unique[Metal](
+    return <unique_ptr[Material]>(new Metal(
       make_vec3(material["albedo"]),
       <float>material["fuzz"]
-    )
+    ))
   # TODO: nicer exception, learn to display traceback in jupyter notebook
   print("Material '{}' not implemented".format(material["type"]))
   raise NotImplementedError(
